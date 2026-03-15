@@ -1,0 +1,15 @@
+# macOS
+.DS_Store
+
+# Build files
+glm-bar
+
+# Environment files
+.env
+
+# Xcode
+build/
+*.xcodeproj
+*.xcworkspace
+xcuserdata/
+*.xcframework
