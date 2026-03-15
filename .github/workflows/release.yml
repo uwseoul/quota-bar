@@ -1,0 +1,30 @@
+name: Build and Release
+
+on:
+  push:
+    tags:
+      - 'v*'
+
+jobs:
+  build:
+    runs-on: macos-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Build App
+        run: |
+          # Swift 파일을 컴파일하여 실행 파일 생성
+          swiftc GLMBarApp.swift Storage.swift UsageFetcher.swift -o GLMBar
+          
+          # 압축 파일 생성
+          zip -r GLMBar.zip GLMBar README.md README_KR.md
+
+      - name: Create Release
+        uses: softprops/action-gh-release@v2
+        with:
+          files: |
+            GLMBar.zip
+            GLMBar
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
