@@ -3,6 +3,8 @@
 
 # Build files
 glm-bar
+build/
+dist/
 
 # Environment files
 .env

@@ -16,19 +16,16 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
 
-      - name: Build App
+      - name: Build Universal Binary
         run: |
-          # Swift 파일을 컴파일하여 실행 파일 생성
-          swiftc GLMBarApp.swift Storage.swift UsageFetcher.swift -o GLMBar
-          
-          # 압축 파일 생성
-          zip -r GLMBar.zip GLMBar README.md README_KR.md
+          chmod +x scripts/build-universal.sh
+          ./scripts/build-universal.sh
 
       - name: Create Release
         uses: softprops/action-gh-release@v2
         with:
           files: |
-            GLMBar.zip
-            GLMBar
+            dist/glm-bar-macos.tar.gz
+            dist/GLMBar.zip
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

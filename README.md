@@ -9,9 +9,18 @@ A lightweight and powerful macOS menu bar application to monitor your **Zhipu AI
 
 ## ✨ Key Features
 
-- **iStat Menus Style UI**: Optimized 2-row vertical layout (Label/Value) for the menu bar.
+ - **iStat Menus Style UI**: Optimized 2-row vertical layout (Label/Value) for the menu bar.
 - **Multi-Quota Monitoring**: Track 5-Hour (5H), Weekly (WK), and Monthly (MO) usage at a glance.
-- **Multiple Display Modes**: Choose between Percentage (%) or intuitive Bar Graph mode.
+- **Three Display Modes**:
+  - **Percent (%)**: Shows usage percentage
+  - **Graph (Bar)**: Visual bar graph
+  - **Speed (Rate)**: Shows usage speed relative to remaining time (Fast/Normal/Slow)
+- **Speed-Based Color Indication**:
+  - 🔴 Fast: Rapid usage - risk of exceeding quota
+  - 🔵 Normal: Average usage speed
+  - 🟢 Slow: Slow usage - safe margin
+- **Dark Mode Support**: Auto/Light/Dark theme selection
+- **Official Z.ai Logo**: Uses official Zhipu AI branding
 - **Privacy Focused**: Your API Key is NOT stored in the source code; it's kept locally and securely on your Mac using `UserDefaults`.
 - **Launch at Login**: Option to automatically start the app when you log in.
 - **Native Performance**: Built with Swift/SwiftUI for extremely low CPU and memory footprint.
@@ -32,8 +41,25 @@ The easiest way to use the app. Works like any other macOS application.
 If you prefer to build it yourself, run the following in your terminal:
 
 ```bash
-swiftc -o glm-bar Storage.swift UsageFetcher.swift GLMBarApp.swift -framework SwiftUI -framework AppKit
-./glm-bar &
+./scripts/build-universal.sh
+```
+
+This creates a **Universal Binary** (works on both Intel and Apple Silicon Macs):
+- `dist/glm-bar` - Terminal binary
+- `dist/GLMBar.app` - App bundle
+- `dist/glm-bar-macos.tar.gz` - Release archive (terminal binary)
+- `dist/GLMBar.zip` - Release archive (app bundle)
+
+**Requirements:** macOS 11.0 (Big Sur) or later
+
+To run the terminal binary:
+```bash
+./dist/glm-bar &
+```
+
+To install the app bundle:
+```bash
+cp -r dist/GLMBar.app /Applications/
 ```
 
 ## ⚙️ How to Setup

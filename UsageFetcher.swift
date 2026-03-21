@@ -46,12 +46,13 @@ class UsageFetcher: ObservableObject {
                     self.lastError = "Parsing Error: \(detail)"
                     print("Decode Error: \(error)")
                 }
-            } receiveValue: { response in
+            }             receiveValue: { response in
                 if response.code == 200 {
                     self.limits = response.data.limits ?? []
                 } else {
                     self.lastError = response.msg
                 }
+                NotificationCenter.default.post(name: NSNotification.Name("UsageUpdated"), object: nil)
             }
             .store(in: &cancellables)
     }
