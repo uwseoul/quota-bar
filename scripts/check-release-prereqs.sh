@@ -3,13 +3,17 @@ set -euo pipefail
 
 NOTARY_PROFILE_NAME="${NOTARY_PROFILE_NAME:-glmbar-notary}"
 
+# Required for Sparkle signing
 REQUIRED_VARS=(
+    "SPARKLE_PRIVATE_KEY"
+)
+
+# Optional for Apple notarization (skip if not available)
+OPTIONAL_NOTARY_VARS=(
     "APPLE_ID"
     "APPLE_APP_SPECIFIC_PASSWORD"
     "APPLE_TEAM_ID"
     "APPLE_DEVELOPER_ID_APPLICATION"
-    "SPARKLE_PRIVATE_KEY"
-    "SPARKLE_PUBLIC_KEY"
 )
 
 missing_vars=()
@@ -29,23 +33,21 @@ if (( ${#missing_vars[@]} > 0 )); then
     exit 1
 fi
 
-identity_value="${APPLE_DEVELOPER_ID_APPLICATION}"
-codesign_identities="$(security find-identity -v -p codesigning 2>/dev/null || true)"
+# Check if notarization is available
+notarization_available=true
+for var_name in "${OPTIONAL_NOTARY_VARS[@]}"; do
+    if [[ -z "${!var_name:-}" ]]; then
+        notarization_available=false
+        break
+    fi
+done
 
-if [[ -z "$codesign_identities" ]]; then
-    echo "[release-prereqs] Could not read local code signing identities from keychain." >&2
-    echo "[release-prereqs] Ensure your signing certificate is installed and keychain access is allowed." >&2
-    exit 1
-fi
-
-if [[ "$codesign_identities" != *"\"$identity_value\""* ]]; then
-    echo "[release-prereqs] APPLE_DEVELOPER_ID_APPLICATION identity not found in keychain:" >&2
-    echo "  - Expected match: $identity_value" >&2
-    echo "[release-prereqs] Available identities:" >&2
-    echo "$codesign_identities" >&2
-    exit 1
+if [[ "$notarization_available" == "true" ]]; then
+    echo "[release-prereqs] OK: Apple notarization credentials are present."
+    echo "[release-prereqs] Notary keychain profile contract: $NOTARY_PROFILE_NAME"
+else
+    echo "[release-prereqs] NOTE: Apple notarization credentials not found. Skipping notarization."
+    echo "[release-prereqs] Users will see 'unidentified developer' warning on first launch."
 fi
 
 echo "[release-prereqs] OK: all required release environment variables are present."
-echo "[release-prereqs] OK: signing identity found for APPLE_DEVELOPER_ID_APPLICATION."
-echo "[release-prereqs] Notary keychain profile contract: $NOTARY_PROFILE_NAME"

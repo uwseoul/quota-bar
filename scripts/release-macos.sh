@@ -70,24 +70,29 @@ if [[ -z "$embedded_public_key" || "$embedded_public_key" == "RELEASE_SPARKLE_PU
     exit 1
 fi
 
-echo "[release] Notarizing app archive..."
-xcrun notarytool submit "$APP_ZIP" \
-    --apple-id "$APPLE_ID" \
-    --password "$APPLE_APP_SPECIFIC_PASSWORD" \
-    --team-id "$APPLE_TEAM_ID" \
-    --wait
+if [[ -n "${APPLE_ID:-}" && -n "${APPLE_APP_SPECIFIC_PASSWORD:-}" && -n "${APPLE_TEAM_ID:-}" ]]; then
+    echo "[release] Notarizing app archive..."
+    xcrun notarytool submit "$APP_ZIP" \
+        --apple-id "$APPLE_ID" \
+        --password "$APPLE_APP_SPECIFIC_PASSWORD" \
+        --team-id "$APPLE_TEAM_ID" \
+        --wait
 
-echo "[release] Stapling notarization ticket..."
-xcrun stapler staple "$APP_BUNDLE"
+    echo "[release] Stapling notarization ticket..."
+    xcrun stapler staple "$APP_BUNDLE"
 
-echo "[release] Repackaging stapled app bundle..."
-rm -f "$APP_ZIP"
-pushd "$DIST_DIR" >/dev/null
-zip -r -q "GLMBar.zip" "GLMBar.app"
-popd >/dev/null
+    echo "[release] Repackaging stapled app bundle..."
+    rm -f "$APP_ZIP"
+    pushd "$DIST_DIR" >/dev/null
+    zip -r -q "GLMBar.zip" "GLMBar.app"
+    popd >/dev/null
 
-echo "[release] Validating Gatekeeper acceptance..."
-spctl -a -vvv -t execute "$APP_BUNDLE"
+    echo "[release] Validating Gatekeeper acceptance..."
+    spctl -a -vvv -t execute "$APP_BUNDLE"
+else
+    echo "[release] Skipping notarization (Apple credentials not provided)."
+    echo "[release] Users will see 'unidentified developer' warning on first launch."
+fi
 
 echo "[release] Preparing updates staging directory..."
 rm -rf "$UPDATES_DIR"
