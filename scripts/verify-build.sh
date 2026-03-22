@@ -69,27 +69,9 @@ fi
         else
             check_fail "Terminal binary is NOT universal. Got: $arch_info"
         fi
-    fi
-
     # =============================================================================
-    # Check 7: App bundle structure exists
+    # Check 5: Info.plist is valid and has required keys
     # =============================================================================
-
-if [[ -f "$APP_BINARY" ]]; then
-    check_pass "App executable exists: $APP_BINARY"
-else
-    check_fail "App executable missing: $APP_BINARY"
-fi
-
-if [[ -f "$APP_INFO_PLIST" ]]; then
-    check_pass "App Info.plist exists: $APP_INFO_PLIST"
-else
-    check_fail "App Info.plist missing: $APP_INFO_PLIST"
-fi
-
-# =============================================================================
-# Check 4: App binary is universal (arm64 + x86_64)
-# =============================================================================
 if [[ -f "$APP_BINARY" ]]; then
     arch_info=$(lipo -info "$APP_BINARY" 2>&1 || true)
     if echo "$arch_info" | grep -q "arm64" && echo "$arch_info" | grep -q "x86_64"; then
@@ -113,13 +95,133 @@ fi
     fi
 
     # =============================================================================
-    # Check 7: App bundle structure exists
+    # Check 5: Info.plist is valid and has required keys
     # =============================================================================
-    if [[ -d "$APP_BUNDLE" ]]; then
-        check_pass "App bundle exists: $APP_BUNDLE"
-    else
-        check_fail "App bundle missing: $APP_BUNDLE"
-    fi
+    if [[ -f "$APP_INFO_PLIST" ]]; then
+        # Validate plist syntax
+        if plutil -lint "$APP_INFO_PLIST" &>/dev/null; then
+            check_pass "Info.plist is valid plist format"
+        else
+            check_fail "Info.plist has invalid plist syntax"
+        fi
+        
+        # Check CFBundleExecutable
+        bundle_exec=$(defaults read "$APP_INFO_PLIST" CFBundleExecutable 2>/dev/null || true)
+        if [[ "$bundle_exec" == "GLMBar" ]]; then
+            check_pass "CFBundleExecutable = GLMBar"
+        else
+            check_fail "CFBundleExecutable should be 'GLMBar', got: '$bundle_exec'"
+        fi
+        
+        # Check CFBundleIdentifier
+        bundle_id=$(defaults read "$APP_INFO_PLIST" CFBundleIdentifier 2>/dev/null || true)
+        if [[ "$bundle_id" == "com.uwseoul.glmbar" ]]; then
+            check_pass "CFBundleIdentifier = com.uwseoul.glmbar"
+        else
+            check_fail "CFBundleIdentifier should be 'com.uwseoul.glmbar', got: '$bundle_id'"
+        fi
+        
+        # Check CFBundlePackageType
+        pkg_type=$(defaults read "$APP_INFO_PLIST" CFBundlePackageType 2>/dev/null || true)
+        if [[ "$pkg_type" == "APPL" ]]; then
+            check_pass "CFBundlePackageType = APPL"
+        else
+            check_fail "CFBundlePackageType should be 'APPL', got: '$pkg_type'"
+        fi
+        
+        # Check LSUIElement (menu bar app should not show in Dock)
+        ls_ui=$(defaults read "$APP_INFO_PLIST" LSUIElement 2>/dev/null || true)
+        if [[ "$ls_ui" == "1" ]] || [[ "$ls_ui" == "true" ]] || [[ "$ls_ui" == "True" ]]; then
+            check_pass "LSUIElement = true (menu bar only)"
+        else
+            check_fail "LSUIElement should be true for menu bar app, got: '$ls_ui'"
+        fi
+        
+        # Check LSMinimumSystemVersion
+        min_ver=$(defaults read "$APP_INFO_PLIST" LSMinimumSystemVersion 2>/dev/null || true)
+        if [[ -n "$min_ver" ]]; then
+            check_pass "LSMinimumSystemVersion = $min_ver"
+        else
+            check_fail "LSMinimumSystemVersion is missing"
+        fi
+        
+        # Check CFBundleExecutable
+        bundle_exec=$(defaults read "$APP_INFO_PLIST" CFBundleExecutable 2>/dev/null || true)
+        if [[ "$bundle_exec" == "GLMBar" ]]; then
+            check_pass "CFBundleExecutable = GLMBar"
+        else
+            check_fail "CFBundleExecutable should be 'GLMBar', got: '$bundle_exec'"
+        fi
+        
+        # Check CFBundleIdentifier
+        bundle_id=$(defaults read "$APP_INFO_PLIST" CFBundleIdentifier 2>/dev/null || true)
+        if [[ "$bundle_id" == "com.uwseoul.glmbar" ]]; then
+            check_pass "CFBundleIdentifier = com.uwseoul.glmbar"
+        else
+            check_fail "CFBundleIdentifier should be 'com.uwseoul.glmbar', got: '$bundle_id'"
+        fi
+        
+        # Check CFBundlePackageType
+        pkg_type=$(defaults read "$APP_INFO_PLIST" CFBundlePackageType 2>/dev/null || true)
+        if [[ "$pkg_type" == "APPL" ]]; then
+            check_pass "CFBundlePackageType = APPL"
+        else
+            check_fail "CFBundlePackageType should be 'APPL', got: '$pkg_type'"
+        fi
+        
+        # Check LSUIElement (menu bar app should not show in Dock)
+        ls_ui=$(defaults read "$APP_INFO_PLIST" LSUIElement 2>/dev/null || true)
+        if [[ "$ls_ui" == "1" ]] || [[ "$ls_ui" == "true" ]] || [[ "$ls_ui" == "True" ]]; then
+            check_pass "LSUIElement = true (menu bar only)"
+        else
+            check_fail "LSUIElement should be true for menu bar app, got: '$ls_ui'"
+        fi
+        
+        # Check LSMinimumSystemVersion
+        min_ver=$(defaults read "$APP_INFO_PLIST" LSMinimumSystemVersion 2>/dev/null || true)
+        if [[ -n "$min_ver" ]]; then
+            check_pass "LSMinimumSystemVersion = $min_ver"
+        else
+            check_fail "LSMinimumSystemVersion is missing"
+        fi
+        bundle_exec=$(defaults read "$APP_INFO_PLIST" CFBundleExecutable 2>/dev/null || true)
+        if [[ "$bundle_exec" == "GLMBar" ]]; then
+            check_pass "CFBundleExecutable = GLMBar"
+        else
+            check_fail "CFBundleExecutable should be 'GLMBar', got: '$bundle_exec'"
+        fi
+        
+        # Check CFBundleIdentifier
+        bundle_id=$(defaults read "$APP_INFO_PLIST" CFBundleIdentifier 2>/dev/null || true)
+        if [[ "$bundle_id" == "com.uwseoul.glmbar" ]]; then
+            check_pass "CFBundleIdentifier = com.uwseoul.glmbar"
+        else
+            check_fail "CFBundleIdentifier should be 'com.uwseoul.glmbar', got: '$bundle_id'"
+        fi
+        
+        # Check CFBundlePackageType
+        pkg_type=$(defaults read "$APP_INFO_PLIST" CFBundlePackageType 2>/dev/null || true)
+        if [[ "$pkg_type" == "APPL" ]]; then
+            check_pass "CFBundlePackageType = APPL"
+        else
+            check_fail "CFBundlePackageType should be 'APPL', got: '$pkg_type'"
+        fi
+        
+        # Check LSUIElement (menu bar app should not show in Dock)
+        ls_ui=$(defaults read "$APP_INFO_PLIST" LSUIElement 2>/dev/null || true)
+        if [[ "$ls_ui" == "1" ]] || [[ "$ls_ui" == "true" ]] || [[ "$ls_ui" == "True" ]]; then
+            check_pass "LSUIElement = true (menu bar only)"
+        else
+            check_fail "LSUIElement should be true for menu bar app, got: '$ls_ui'"
+        fi
+        
+        # Check LSMinimumSystemVersion
+        min_ver=$(defaults read "$APP_INFO_PLIST" LSMinimumSystemVersion 2>/dev/null || true)
+        if [[ -n "$min_ver" ]]; then
+            check_pass "LSMinimumSystemVersion = $min_ver"
+        else
+            check_fail "LSMinimumSystemVersion is missing"
+        fi
 
     if [[ -f "$APP_BINARY" ]]; then
         check_pass "App executable exists: $APP_BINARY"
