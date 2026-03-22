@@ -19,6 +19,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
         configureStatusItem()
         observeState()
         refreshUsage()
+        updaterController.checkForUpdatesInBackground()
         startRefreshTimer()
     }
 
@@ -436,6 +437,22 @@ struct SettingsView: View {
             }
             
             Group {
+                Divider().padding(.vertical, 2)
+
+                SectionHeader(title: "Updates")
+                Text(updaterController.statusMessage)
+                    .font(.caption)
+                    .foregroundColor(.secondary)
+                if let lastCheckDate = updaterController.lastCheckDate {
+                    Text("Last checked: \(lastCheckDate.formatted(date: .abbreviated, time: .shortened))")
+                        .font(.caption2)
+                        .foregroundColor(.secondary)
+                }
+                Button(updaterController.updateAvailable ? "Open Latest Release" : "Check GitHub Releases") {
+                    updaterController.checkForUpdates()
+                }
+                .buttonStyle(.bordered)
+
                 Divider().padding(.vertical, 2)
                 
                 SectionHeader(title: "Appearance")

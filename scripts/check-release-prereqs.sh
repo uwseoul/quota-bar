@@ -1,14 +1,10 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-NOTARY_PROFILE_NAME="${NOTARY_PROFILE_NAME:-glmbar-notary}"
-
-# Optional for Apple notarization (skip if not available)
 OPTIONAL_NOTARY_VARS=(
     "APPLE_ID"
     "APPLE_APP_SPECIFIC_PASSWORD"
     "APPLE_TEAM_ID"
-    "APPLE_DEVELOPER_ID_APPLICATION"
 )
 
 # Check if notarization is available
@@ -22,7 +18,11 @@ done
 
 if [[ "$notarization_available" == "true" ]]; then
     echo "[release-prereqs] OK: Apple notarization credentials are present."
-    echo "[release-prereqs] Notary keychain profile contract: $NOTARY_PROFILE_NAME"
+    if [[ -n "${APPLE_DEVELOPER_ID_APPLICATION:-}" ]]; then
+        echo "[release-prereqs] OK: Developer ID application identity is available for signing."
+    else
+        echo "[release-prereqs] NOTE: APPLE_DEVELOPER_ID_APPLICATION is not set in the shell environment."
+    fi
 else
     echo "[release-prereqs] NOTE: Apple notarization credentials not found. Skipping notarization."
     echo "[release-prereqs] Users will see 'unidentified developer' warning on first launch."

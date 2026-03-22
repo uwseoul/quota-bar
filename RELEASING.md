@@ -1,22 +1,21 @@
 # Releasing GLMBar
 
-This runbook covers local and CI release steps for Sparkle-based app updates.
+This runbook covers local and CI release steps for packaged GitHub Releases.
 
 ## Scope
 
-- `GLMBar.app` supports Sparkle auto-update.
-- `glm-bar` CLI archive is release-only and manual-update.
+- `GLMBar.app` exposes an in-app "Check for Updates..." action that checks the latest GitHub release.
+- Both `GLMBar.app` and `glm-bar` are distributed through GitHub Releases.
+- There is no Sparkle feed or appcast generation in the current release flow.
 
 ## Required Secrets
 
-Release pipeline requires:
+Release pipeline can use:
 
 - `APPLE_ID`
 - `APPLE_APP_SPECIFIC_PASSWORD`
 - `APPLE_TEAM_ID`
-- `APPLE_DEVELOPER_ID_APPLICATION`
-- `SPARKLE_PRIVATE_KEY`
-- `SPARKLE_PUBLIC_KEY`
+- `APPLE_DEVELOPER_ID_APPLICATION` (only if your signing flow needs it in the shell environment)
 
 ## Local Release
 
@@ -26,7 +25,7 @@ Release pipeline requires:
 ./scripts/check-release-prereqs.sh
 ```
 
-2. Build, sign, notarize, staple, and generate appcast.
+2. Build release archives, then notarize and staple when Apple credentials are available.
 
 ```bash
 RELEASE_VERSION=1.0.1 RELEASE_BUILD_NUMBER=101 RELEASE_TAG=v1.0.1 ./scripts/release-macos.sh
@@ -37,11 +36,8 @@ RELEASE_VERSION=1.0.1 RELEASE_BUILD_NUMBER=101 RELEASE_TAG=v1.0.1 ./scripts/rele
 - `dist/GLMBar.app`
 - `dist/GLMBar.zip`
 - `dist/glm-bar-macos.tar.gz`
-- `updates/appcast.xml`
 
-4. Confirm appcast enclosure URL points to the exact tag asset.
-
-- `https://github.com/uwseoul/glm-bar/releases/download/v1.0.1/GLMBar.zip`
+4. Confirm the GitHub Release contains the expected assets for the tag.
 
 ## CI Release (GitHub Actions)
 
@@ -49,7 +45,6 @@ RELEASE_VERSION=1.0.1 RELEASE_BUILD_NUMBER=101 RELEASE_TAG=v1.0.1 ./scripts/rele
 - Trigger: push tag matching `v*`
 - Outputs:
   - GitHub Release assets: `dist/GLMBar.zip`, `dist/glm-bar-macos.tar.gz`
-  - GitHub Pages artifact from `updates/` including `appcast.xml`
 
 Tag and push:
 
@@ -76,12 +71,7 @@ git push origin v1.0.1
 - Symptom: `xcrun notarytool submit ... --wait` fails.
 - Action: inspect notarization log, fix signature/runtime entitlement issue, rerun release script.
 
-### Appcast URL mismatch
+### Release assets missing
 
-- Symptom: release script fails enclosure URL check.
-- Action: confirm `REPO_SLUG`, `RELEASE_TAG`, and generated appcast contain expected GitHub Releases URL.
-
-### Placeholder Sparkle key left in bundle plist
-
-- Symptom: release verification passes non-empty key but updater trust key is placeholder.
-- Action: ensure release process sets `SPARKLE_PUBLIC_KEY` and replaces placeholder before publishing.
+- Symptom: GitHub Release completes without `GLMBar.zip` or `glm-bar-macos.tar.gz`.
+- Action: inspect `.github/workflows/release.yml` and local `dist/` outputs, then rerun the release after the build step succeeds.

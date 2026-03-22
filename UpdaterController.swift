@@ -15,6 +15,22 @@ final class UpdaterController: ObservableObject {
         Bundle.main.infoDictionary?["CFBundleShortVersionString"] as? String ?? "1.0.0"
     }
 
+    var statusMessage: String {
+        if checkingForUpdates {
+            return "Checking latest GitHub release..."
+        }
+
+        guard let latestVersion else {
+            return "Checks GitHub Releases and opens the download page when a newer version is available."
+        }
+
+        if updateAvailable {
+            return "Version \(latestVersion) is available on GitHub Releases."
+        }
+
+        return "You are on the latest version (\(currentVersion))."
+    }
+
     func checkForUpdatesInBackground() {
         Task {
             await checkLatestRelease()

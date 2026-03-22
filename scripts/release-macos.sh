@@ -5,12 +5,9 @@ SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 PROJECT_ROOT="$(cd "$SCRIPT_DIR/.." && pwd)"
 
 DIST_DIR="$PROJECT_ROOT/dist"
-UPDATES_DIR="$PROJECT_ROOT/updates"
 
 BUILD_SCRIPT="$SCRIPT_DIR/build-universal.sh"
 PREREQ_SCRIPT="$SCRIPT_DIR/check-release-prereqs.sh"
-
-REPO_SLUG="${REPO_SLUG:-uwseoul/glm-bar}"
 
 if [[ -z "${RELEASE_VERSION:-}" ]]; then
     echo "RELEASE_VERSION is required (example: 1.0.1)." >&2
