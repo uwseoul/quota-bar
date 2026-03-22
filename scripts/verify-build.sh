@@ -137,13 +137,17 @@ if [[ -f "$APP_INFO_PLIST" ]]; then
 fi
 
 # =============================================================================
-# Check 6: App bundle passes codesign
+# Check 6: Signed app bundles pass codesign
 # =============================================================================
 if [[ -d "$APP_BUNDLE" ]]; then
-    if codesign -vvv --deep --strict "$APP_BUNDLE" >/dev/null 2>&1; then
-        check_pass "App bundle passes codesign -vvv --deep --strict"
+    if codesign -dv --verbose=2 "$APP_BUNDLE" >/dev/null 2>&1; then
+        if codesign -vvv --deep --strict "$APP_BUNDLE" >/dev/null 2>&1; then
+            check_pass "App bundle passes codesign -vvv --deep --strict"
+        else
+            check_fail "App bundle has an invalid code signature"
+        fi
     else
-        check_fail "App bundle failed codesign -vvv --deep --strict"
+        check_info "App bundle is unsigned; this is expected when Apple signing credentials are not provided"
     fi
 fi
 
