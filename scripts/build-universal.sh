@@ -1,5 +1,4 @@
 #!/usr/bin/env bash
-# Build universal macOS binary (arm64 + x86_64) for GLM Bar
 set -euo pipefail
 
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
@@ -23,8 +22,6 @@ DEPLOYMENT_TARGET="11.0"
 RELEASE_BUILD_FLAG="${RELEASE_BUILD:-0}"
 RELEASE_VERSION_INPUT="${RELEASE_VERSION:-}"
 RELEASE_BUILD_NUMBER_INPUT="${RELEASE_BUILD_NUMBER:-}"
-SPARKLE_FRAMEWORK_SOURCE="$PROJECT_ROOT/vendor/Sparkle.xcframework/macos-arm64_x86_64/Sparkle.framework"
-SPARKLE_FRAMEWORK_SEARCH_PATH="$PROJECT_ROOT/vendor/Sparkle.xcframework/macos-arm64_x86_64"
 APP_ICON_SOURCE="$PROJECT_ROOT/packaging/icons/AppIcon.icns"
 
 APP_VERSION=""
@@ -62,12 +59,6 @@ resolve_version_inputs() {
 }
 
 assert_bundle_assets() {
-    if [[ ! -d "$SPARKLE_FRAMEWORK_SOURCE" ]]; then
-        echo "Missing Sparkle framework at: $SPARKLE_FRAMEWORK_SOURCE" >&2
-        echo "Ensure vendored Sparkle dependency exists before building." >&2
-        exit 1
-    fi
-
     if [[ ! -f "$APP_ICON_SOURCE" ]]; then
         echo "Missing app icon at: $APP_ICON_SOURCE" >&2
         exit 1
@@ -82,12 +73,8 @@ build_arm64() {
         -O \
         -o "$BUILD_DIR/arm64/$BINARY_NAME" \
         "${SOURCE_FILES[@]}" \
-        -F "$SPARKLE_FRAMEWORK_SEARCH_PATH" \
         -framework SwiftUI \
-        -framework AppKit \
-        -framework Sparkle \
-        -Xlinker -rpath \
-        -Xlinker "@executable_path/../Frameworks"
+        -framework AppKit
     echo "✓ arm64 build complete"
 }
 
@@ -99,12 +86,8 @@ build_x86_64() {
         -O \
         -o "$BUILD_DIR/x86_64/$BINARY_NAME" \
         "${SOURCE_FILES[@]}" \
-        -F "$SPARKLE_FRAMEWORK_SEARCH_PATH" \
         -framework SwiftUI \
-        -framework AppKit \
-        -framework Sparkle \
-        -Xlinker -rpath \
-        -Xlinker "@executable_path/../Frameworks"
+        -framework AppKit
     echo "✓ x86_64 build complete"
 }
 
@@ -123,61 +106,21 @@ create_app_bundle() {
     local app_dir="$DIST_DIR/$APP_NAME.app"
     local contents_dir="$app_dir/Contents"
     local macos_dir="$contents_dir/MacOS"
-    local frameworks_dir="$contents_dir/Frameworks"
     local resources_dir="$contents_dir/Resources"
     
     rm -rf "$app_dir"
-    mkdir -p "$macos_dir" "$frameworks_dir" "$resources_dir"
+    mkdir -p "$macos_dir" "$resources_dir"
     
     cp "$DIST_DIR/$BINARY_NAME" "$macos_dir/$APP_NAME"
     cp "$PROJECT_ROOT/packaging/Info.plist" "$contents_dir/Info.plist"
     cp "$APP_ICON_SOURCE" "$resources_dir/AppIcon.icns"
-    cp -R "$SPARKLE_FRAMEWORK_SOURCE" "$frameworks_dir/"
 
     /usr/libexec/PlistBuddy -c "Set :CFBundleShortVersionString $APP_VERSION" "$contents_dir/Info.plist"
     /usr/libexec/PlistBuddy -c "Set :CFBundleVersion $APP_BUILD_NUMBER" "$contents_dir/Info.plist"
-
-    if [[ -n "${SPARKLE_PUBLIC_KEY:-}" ]]; then
-        /usr/libexec/PlistBuddy -c "Set :SUPublicEDKey $SPARKLE_PUBLIC_KEY" "$contents_dir/Info.plist"
-    fi
     
     chmod +x "$macos_dir/$APP_NAME"
 
-    sign_app_bundle "$app_dir"
-    
     echo "✓ App bundle created: $app_dir"
-}
-
-sign_app_bundle() {
-    local app_dir="$1"
-    local sparkle_framework="$app_dir/Contents/Frameworks/Sparkle.framework"
-    local sparkle_current_dir="$sparkle_framework/Versions/Current"
-    local signing_identity="-"
-    local -a codesign_args=(--force --sign "$signing_identity")
-
-    if [[ "$RELEASE_BUILD_FLAG" == "1" ]]; then
-        signing_identity="${APPLE_DEVELOPER_ID_APPLICATION}"
-        codesign_args=(--force --sign "$signing_identity" --options runtime --timestamp)
-    fi
-
-    if [[ ! -d "$sparkle_framework" ]]; then
-        echo "Embedded Sparkle framework missing: $sparkle_framework" >&2
-        exit 1
-    fi
-
-    if [[ -d "$sparkle_current_dir/XPCServices" ]]; then
-        for xpc_service in "$sparkle_current_dir"/XPCServices/*.xpc; do
-            [[ -e "$xpc_service" ]] || continue
-            codesign "${codesign_args[@]}" "$xpc_service"
-        done
-    fi
-
-    if [[ -d "$sparkle_current_dir/Autoupdate.app" ]]; then
-        codesign "${codesign_args[@]}" "$sparkle_current_dir/Autoupdate.app"
-    fi
-
-    codesign "${codesign_args[@]}" "$sparkle_framework"
-    codesign "${codesign_args[@]}" "$app_dir"
 }
 
 create_release_archives() {
