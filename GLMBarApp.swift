@@ -2,9 +2,11 @@ import AppKit
 import Combine
 import SwiftUI
 
+@MainActor
 final class AppDelegate: NSObject, NSApplicationDelegate {
     private let storage = Storage()
     private let fetcher = UsageFetcher()
+    private let updaterController = UpdaterController()
     private let popover = NSPopover()
     private var statusItem: NSStatusItem?
     private var refreshTimer: Timer?
@@ -32,6 +34,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
             rootView: ContentView()
                 .environmentObject(storage)
                 .environmentObject(fetcher)
+                .environmentObject(updaterController)
         )
     }
 
@@ -65,7 +68,9 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
     private func startRefreshTimer() {
         refreshTimer?.invalidate()
         refreshTimer = Timer.scheduledTimer(withTimeInterval: 300, repeats: true) { [weak self] _ in
-            self?.refreshUsage()
+            Task { @MainActor [weak self] in
+                self?.refreshUsage()
+            }
         }
     }
 
@@ -236,6 +241,7 @@ struct MenuBarLabel: View {
 struct ContentView: View {
     @EnvironmentObject var storage: Storage
     @EnvironmentObject var fetcher: UsageFetcher
+    @EnvironmentObject var updaterController: UpdaterController
     @State private var showingSettings = false
     
     var body: some View {
@@ -254,6 +260,12 @@ struct ContentView: View {
                 HStack {
                     Button("Settings...") { showingSettings = true }
                         .buttonStyle(.bordered)
+                    Spacer()
+                    Button("Check for Updates...") {
+                        updaterController.checkForUpdates()
+                    }
+                    .buttonStyle(.bordered)
+                    .disabled(!updaterController.canCheckForUpdates)
                     Spacer()
                     Button("Quit") { NSApplication.shared.terminate(nil) }
                         .buttonStyle(.bordered)
@@ -390,6 +402,7 @@ struct ContentView: View {
 
 struct SettingsView: View {
     @EnvironmentObject var storage: Storage
+    @EnvironmentObject var updaterController: UpdaterController
     
     var body: some View {
         VStack(alignment: .leading, spacing: 10) {
@@ -438,6 +451,17 @@ struct SettingsView: View {
                 
                 Toggle("Launch at Login (Auto Start)", isOn: $storage.launchAtLogin)
                     .font(.caption)
+
+                Divider().padding(.vertical, 2)
+
+                Toggle(
+                    "Automatic Updates",
+                    isOn: Binding(
+                        get: { updaterController.automaticUpdatesEnabled },
+                        set: { updaterController.setAutomaticUpdatesEnabled($0) }
+                    )
+                )
+                .font(.caption)
             }
         }
         .padding(.horizontal)

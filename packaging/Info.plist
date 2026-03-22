@@ -26,6 +26,12 @@
     <true/>
     <key>NSHighResolutionCapable</key>
     <true/>
+    <key>SUAllowsAutomaticUpdates</key>
+    <true/>
+    <key>SUFeedURL</key>
+    <string>https://uwseoul.github.io/glm-bar/appcast.xml</string>
+    <key>SUPublicEDKey</key>
+    <string>RELEASE_SPARKLE_PUBLIC_KEY_PLACEHOLDER</string>
     <key>NSPrincipalClass</key>
     <string>NSApplication</string>
 </dict>
