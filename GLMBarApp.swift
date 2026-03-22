@@ -265,7 +265,6 @@ struct ContentView: View {
                         updaterController.checkForUpdates()
                     }
                     .buttonStyle(.bordered)
-                    .disabled(!updaterController.canCheckForUpdates)
                     Spacer()
                     Button("Quit") { NSApplication.shared.terminate(nil) }
                         .buttonStyle(.bordered)
@@ -452,16 +451,8 @@ struct SettingsView: View {
                 Toggle("Launch at Login (Auto Start)", isOn: $storage.launchAtLogin)
                     .font(.caption)
 
-                Divider().padding(.vertical, 2)
-
-                Toggle(
-                    "Automatic Updates",
-                    isOn: Binding(
-                        get: { updaterController.automaticUpdatesEnabled },
-                        set: { updaterController.setAutomaticUpdatesEnabled($0) }
-                    )
-                )
-                .font(.caption)
+                .padding(.horizontal)
+                .padding(.bottom, 8)
             }
         }
         .padding(.horizontal)
