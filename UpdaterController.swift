@@ -1,7 +1,7 @@
 import Combine
+import AppKit
 import Foundation
 
-@MainActor
 final class UpdaterController: ObservableObject {
     @Published private(set) var latestVersion: String?
     @Published private(set) var updateAvailable = false
