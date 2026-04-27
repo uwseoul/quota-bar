@@ -5,14 +5,17 @@ SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 PROJECT_ROOT="$(cd "$SCRIPT_DIR/.." && pwd)"
 
 SOURCE_FILES=(
-    "$PROJECT_ROOT/Storage.swift"
-    "$PROJECT_ROOT/UsageFetcher.swift"
-    "$PROJECT_ROOT/GLMBarApp.swift"
+    "$PROJECT_ROOT/QuotaBarApp.swift"
+    "$PROJECT_ROOT/Models/Storage.swift"
+    "$PROJECT_ROOT/Services/UsageFetcher.swift"
+    "$PROJECT_ROOT/Services/GLMFetcher.swift"
+    "$PROJECT_ROOT/Services/MiniMaxFetcher.swift"
+    "$PROJECT_ROOT/Services/CodexFetcher.swift"
+    "$PROJECT_ROOT/Services/OpenCodeGoFetcher.swift"
+    "$PROJECT_ROOT/Views/ContentView.swift"
+    "$PROJECT_ROOT/Views/SettingsView.swift"
+    "$PROJECT_ROOT/Views/MenuBarRenderer.swift"
 )
-
-if [[ -f "$PROJECT_ROOT/UpdaterController.swift" ]]; then
-    SOURCE_FILES+=("$PROJECT_ROOT/UpdaterController.swift")
-fi
 
 BUILD_DIR="$PROJECT_ROOT/build"
 DIST_DIR="$PROJECT_ROOT/dist"
@@ -154,7 +157,7 @@ print_summary() {
 }
 
 main() {
-    echo "GLM Bar Universal Build"
+    echo "Quota Bar Universal Build"
     echo "======================="
     echo ""
     
