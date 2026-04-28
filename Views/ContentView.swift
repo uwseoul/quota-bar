@@ -275,7 +275,7 @@ struct ContentView: View {
         case .fast:
             return .red
         case .normal:
-            return .blue
+            return .yellow
         case .slow:
             return .green
         }
