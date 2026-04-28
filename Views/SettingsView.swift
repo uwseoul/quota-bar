@@ -5,6 +5,13 @@ struct SettingsView: View {
     @EnvironmentObject var fetcher: UsageFetcher
     @EnvironmentObject var updaterController: UpdaterController
 
+    private static let dateFormatter: DateFormatter = {
+        let formatter = DateFormatter()
+        formatter.dateStyle = .medium
+        formatter.timeStyle = .short
+        return formatter
+    }()
+
     var body: some View {
         ScrollView {
             VStack(alignment: .leading, spacing: 10) {
@@ -110,7 +117,7 @@ struct SettingsView: View {
                         .font(.caption)
                         .foregroundColor(.secondary)
                     if let lastCheckDate = updaterController.lastCheckDate {
-                        Text("Last checked: \(lastCheckDate.formatted(date: .abbreviated, time: .shortened))")
+                        Text("Last checked: \(Self.dateFormatter.string(from: lastCheckDate))")
                             .font(.caption2)
                             .foregroundColor(.secondary)
                     }
