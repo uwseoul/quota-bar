@@ -103,9 +103,6 @@ struct MiniMaxFetcher: PlatformFetcher {
                 let percent5hr = intervalTotal > 0 ? Double(used5hr) / Double(intervalTotal) : 0.0
                 let percentWeekly = weeklyTotal > 0 ? Double(usedWeekly) / Double(weeklyTotal) : 0.0
 
-                let status5hr: SpeedStatus = percent5hr > 0.8 ? .fast : (percent5hr < 0.3 ? .slow : .normal)
-                let statusWeekly: SpeedStatus = percentWeekly > 0.8 ? .fast : (percentWeekly < 0.3 ? .slow : .normal)
-
                 return [
                     QuotaEntry(
                         id: "minimax_5h",
@@ -115,7 +112,7 @@ struct MiniMaxFetcher: PlatformFetcher {
                         usage: used5hr,
                         total: intervalTotal,
                         resetSeconds: model.remainsTime.map { $0 / 1000 },
-                        speedStatus: status5hr
+                        totalDurationSeconds: 5 * 60 * 60
                     ),
                     QuotaEntry(
                         id: "minimax_weekly",
@@ -125,7 +122,7 @@ struct MiniMaxFetcher: PlatformFetcher {
                         usage: usedWeekly,
                         total: weeklyTotal,
                         resetSeconds: model.weeklyRemainsTime.map { $0 / 1000 },
-                        speedStatus: statusWeekly
+                        totalDurationSeconds: 7 * 24 * 60 * 60
                     )
                 ]
             }

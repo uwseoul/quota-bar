@@ -61,7 +61,7 @@ struct OpenCodeGoFetcher: PlatformFetcher {
                 usage: nil,
                 total: nil,
                 resetSeconds: rolling.resetInSec,
-                speedStatus: heuristicSpeed(usagePercent: Double(rolling.percent) / 100.0)
+                totalDurationSeconds: 5 * 60 * 60
             ))
         }
         if let weekly = weekly {
@@ -73,7 +73,7 @@ struct OpenCodeGoFetcher: PlatformFetcher {
                 usage: nil,
                 total: nil,
                 resetSeconds: weekly.resetInSec,
-                speedStatus: heuristicSpeed(usagePercent: Double(weekly.percent) / 100.0)
+                totalDurationSeconds: 7 * 24 * 60 * 60
             ))
         }
         if let monthly = monthly {
@@ -85,7 +85,7 @@ struct OpenCodeGoFetcher: PlatformFetcher {
                 usage: nil,
                 total: nil,
                 resetSeconds: monthly.resetInSec,
-                speedStatus: heuristicSpeed(usagePercent: Double(monthly.percent) / 100.0)
+                totalDurationSeconds: 30 * 24 * 60 * 60
             ))
         }
 
@@ -112,9 +112,4 @@ struct OpenCodeGoFetcher: PlatformFetcher {
         return (percent, reset)
     }
 
-    private static func heuristicSpeed(usagePercent: Double) -> SpeedStatus {
-        if usagePercent > 0.8 { return .fast }
-        if usagePercent < 0.3 { return .slow }
-        return .normal
-    }
 }

@@ -42,11 +42,7 @@ struct CodexFetcher: PlatformFetcher {
                         usage: nil,
                         total: nil,
                         resetSeconds: resetSeconds > 0 ? resetSeconds : nil,
-                        speedStatus: Self.calculateSpeedStatus(
-                            usedPercent: Double(primary.usedPercent) / 100.0,
-                            resetAt: primary.resetAt,
-                            windowSeconds: primary.limitWindowSeconds
-                        )
+                        totalDurationSeconds: primary.limitWindowSeconds
                     ))
                 }
 
@@ -60,11 +56,7 @@ struct CodexFetcher: PlatformFetcher {
                         usage: nil,
                         total: nil,
                         resetSeconds: resetSeconds > 0 ? resetSeconds : nil,
-                        speedStatus: Self.calculateSpeedStatus(
-                            usedPercent: Double(secondary.usedPercent) / 100.0,
-                            resetAt: secondary.resetAt,
-                            windowSeconds: secondary.limitWindowSeconds
-                        )
+                        totalDurationSeconds: secondary.limitWindowSeconds
                     ))
                 }
 
@@ -78,44 +70,13 @@ struct CodexFetcher: PlatformFetcher {
                         usage: nil,
                         total: nil,
                         resetSeconds: resetSeconds > 0 ? resetSeconds : nil,
-                        speedStatus: Self.calculateSpeedStatus(
-                            usedPercent: Double(codeReview.usedPercent) / 100.0,
-                            resetAt: codeReview.resetAt,
-                            windowSeconds: codeReview.limitWindowSeconds
-                        )
+                        totalDurationSeconds: codeReview.limitWindowSeconds
                     ))
                 }
 
                 return entries
             }
             .eraseToAnyPublisher()
-    }
-
-    private static func calculateSpeedStatus(usedPercent: Double, resetAt: Int, windowSeconds: Int) -> SpeedStatus {
-        let now = Int(Date().timeIntervalSince1970)
-        let remaining = resetAt - now
-
-        if remaining <= 0 {
-            return .normal
-        }
-
-        let totalDuration = windowSeconds
-        let elapsed = totalDuration - remaining
-        let elapsedPercent = Double(elapsed) / Double(totalDuration)
-
-        if elapsedPercent < 0.01 {
-            return .normal
-        }
-
-        let speedRatio = usedPercent / elapsedPercent
-
-        if speedRatio > 1.3 {
-            return .fast
-        } else if speedRatio < 0.7 {
-            return .slow
-        } else {
-            return .normal
-        }
     }
 }
 

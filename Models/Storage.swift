@@ -68,7 +68,29 @@ struct QuotaEntry: Identifiable {
     let usage: Int?
     let total: Int?
     let resetSeconds: Int?
-    let speedStatus: SpeedStatus
+    let totalDurationSeconds: Int?
+
+    var speedStatus: SpeedStatus {
+        guard let resetSeconds = resetSeconds, resetSeconds > 0,
+              let totalDuration = totalDurationSeconds, totalDuration > 0 else {
+            if usagePercent > 0.8 { return .fast }
+            if usagePercent < 0.3 { return .slow }
+            return .normal
+        }
+
+        let elapsedSeconds = totalDuration - resetSeconds
+        let elapsedPercent = Double(elapsedSeconds) / Double(totalDuration)
+        let remainingTimePercent = 1.0 - elapsedPercent
+        let remainingUsagePercent = 1.0 - usagePercent
+
+        if remainingUsagePercent < remainingTimePercent * 0.5 {
+            return .fast
+        } else if remainingUsagePercent > remainingTimePercent * 1.3 {
+            return .slow
+        } else {
+            return .normal
+        }
+    }
 }
 
 struct PlatformResult {
@@ -437,7 +459,7 @@ struct GLMLimit: Codable, Identifiable {
             usage: usage,
             total: total,
             resetSeconds: resetTimeSeconds,
-            speedStatus: speedStatus
+            totalDurationSeconds: totalDurationSeconds
         )
     }
 }
