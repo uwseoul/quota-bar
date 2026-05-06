@@ -2,7 +2,9 @@
 
 # Quota Bar 🚀
 
-A lightweight and powerful macOS menu bar application to monitor your **AI coding plan usage** across multiple platforms in real-time.
+A lightweight and powerful macOS menu bar application that monitors your **AI coding plan token burn rate** across multiple platforms in real-time.
+
+**Key Differentiator**: Unlike simple percentage trackers, Quota Bar shows you **how fast you're consuming tokens relative to time** — so you know if you're on track to exceed your quota before it's too late.
 
 **Previously known as GLM Bar** — now supports 4 platforms!
 
@@ -11,22 +13,23 @@ A lightweight and powerful macOS menu bar application to monitor your **AI codin
 
 ## ✨ Key Features
 
+- **🔥 Token Burn Rate Monitoring (Pace)**: The standout feature — see not just how much you've used, but **how fast you're burning through your quota relative to elapsed time**. Green means safe pace, yellow means on track, red means you're consuming faster than average and may hit the limit.
 - **Multi-Platform Support**: Monitor usage across **GLM (z.ai)**, **MiniMax**, **OpenAI Codex**, and **OpenCode Go** — all in one app.
 - **iStat Menus Style UI**: Optimized vertical layout for the menu bar.
 - **Multi-Quota Monitoring**: Track 5-Hour (5H), Weekly (WK), Monthly (MO), Rolling, 7D, and more.
 - **Three Display Modes**:
   - **Percent (%)**: Shows usage percentage
   - **Graph (Bar)**: Visual bar graph
-  - **Speed (Signal)**: Traffic light indicator (Green/Yellow/Red) for usage speed
+  - **Speed (Pace)**: Traffic light indicator (Green/Yellow/Red) for token burn rate
 - **Four Menu Bar Modes**:
   - **Highest Usage**: Show the single highest usage quota across all platforms
   - **First Quota per Platform**: Show the first quota from each active platform
   - **One per Platform**: Show the highest usage quota from each platform
   - **Manual Select**: Choose exactly which quotas appear in the menu bar
-- **Speed-Based Color Indication**:
-  - 🔴 Red (Fast): Rapid usage — risk of exceeding quota
-  - 🟡 Yellow (Normal): Average usage speed
-  - 🟢 Green (Slow): Slow usage — safe margin
+- **Pace-Based Color Indication**:
+  - 🔴 Red (Fast): Rapid token consumption — risk of exceeding quota
+  - 🟡 Yellow (Normal): Average consumption pace
+  - 🟢 Green (Slow): Slow consumption — safe margin
 - **Dark Mode Support**: White text adapts to both dark and light menu bar themes
 - **Card-Style Popover**: Platform usage displayed in clean, separated cards
 - **Right-Click for Settings**: Quick access to settings via right-click on the menu bar icon
