@@ -101,12 +101,6 @@ struct SettingsView: View {
                         }
                     }
 
-                    VStack(alignment: .leading, spacing: 4) {
-                        Toggle("5 Hours Quota", isOn: $storage.show5h)
-                        Toggle("Weekly Quota", isOn: $storage.showWeekly)
-                        Toggle("Monthly Quota", isOn: $storage.showMonthly)
-                    }
-                    .font(.caption)
                 }
 
                 VStack(alignment: .leading, spacing: 4) {
