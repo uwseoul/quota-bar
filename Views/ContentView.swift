@@ -183,7 +183,7 @@ struct ContentView: View {
 
                 HStack(spacing: 4) {
                     speedBadge(for: entry.speedStatus)
-                    Text("\(Int(entry.usagePercent * 100))%")
+                    Text("\(entry.displayPercent)%")
                         .font(.system(size: 11, weight: .medium))
                         .foregroundColor(entry.usagePercent > 0.8 ? .orange : .primary)
                 }
@@ -196,8 +196,8 @@ struct ContentView: View {
                         .frame(height: 8)
 
                     RoundedRectangle(cornerRadius: 3)
-                        .fill(speedColor(for: entry.speedStatus))
-                        .frame(width: geometry.size.width * CGFloat(min(max(entry.usagePercent, 0.05), 1.0)), height: 8)
+                        .fill(entry.speedStatus.swiftUIColor)
+                        .frame(width: progressWidth(for: entry, totalWidth: geometry.size.width), height: 8)
                 }
             }
             .frame(height: 8)
@@ -250,13 +250,18 @@ struct ContentView: View {
     private func speedBadge(for status: SpeedStatus) -> some View {
         HStack(spacing: 2) {
             Circle()
-                .fill(speedColor(for: status))
+                .fill(status.swiftUIColor)
                 .frame(width: 6, height: 6)
 
             Text(speedLabel(for: status))
                 .font(.system(size: 8, weight: .medium))
-                .foregroundColor(speedColor(for: status))
+                .foregroundColor(status.swiftUIColor)
         }
+    }
+
+    private func progressWidth(for entry: QuotaEntry, totalWidth: CGFloat) -> CGFloat {
+        guard entry.displayPercent > 0 else { return 0 }
+        return totalWidth * CGFloat(min(max(entry.usagePercent, 0.05), 1.0))
     }
 
     private func speedLabel(for status: SpeedStatus) -> String {
@@ -270,16 +275,6 @@ struct ContentView: View {
         }
     }
 
-    private func speedColor(for status: SpeedStatus) -> Color {
-        switch status {
-        case .fast:
-            return .red
-        case .normal:
-            return .yellow
-        case .slow:
-            return .green
-        }
-    }
 }
 
 private struct QuotaPlatformSection: Identifiable {

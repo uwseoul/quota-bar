@@ -34,7 +34,7 @@ enum MenuBarRenderer {
                     .paragraphStyle: valueStyle
                 ]
                 let valueString = NSAttributedString(
-                    string: "\(Int(entry.usagePercent * 100))%",
+                    string: "\(entry.displayPercent)%",
                     attributes: valueAttributes
                 )
                 valueString.draw(in: NSRect(x: xOffset, y: 0, width: itemWidth, height: 12))
@@ -65,7 +65,7 @@ enum MenuBarRenderer {
         NSColor.lightGray.setFill()
         background.fill()
 
-        let fillWidth = barWidth * CGFloat(min(max(entry.usagePercent, 0.05), 1.0))
+        let fillWidth = entry.displayPercent == 0 ? 0 : barWidth * CGFloat(min(max(entry.usagePercent, 0.05), 1.0))
         let foreground = NSBezierPath(
             roundedRect: NSRect(x: barX, y: barY, width: fillWidth, height: barHeight),
             xRadius: 2,
@@ -80,16 +80,8 @@ enum MenuBarRenderer {
         let indicatorX = xOffset + (itemWidth - indicatorSize) / 2
         let indicatorY: CGFloat = 2
         let indicatorPath = NSBezierPath(ovalIn: NSRect(x: indicatorX, y: indicatorY, width: indicatorSize, height: indicatorSize))
-        signalColor(for: entry.speedStatus).setFill()
+        entry.speedStatus.color.setFill()
         indicatorPath.fill()
-    }
-
-    private static func signalColor(for status: SpeedStatus) -> NSColor {
-        switch status {
-        case .fast: return NSColor(red: 1.0, green: 0.2, blue: 0.2, alpha: 1.0)
-        case .normal: return NSColor(red: 1.0, green: 0.75, blue: 0.0, alpha: 1.0)
-        case .slow: return NSColor(red: 0.0, green: 0.8, blue: 0.0, alpha: 1.0)
-        }
     }
 
     private static func speedSymbol(for status: SpeedStatus) -> String {

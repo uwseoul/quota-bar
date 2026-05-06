@@ -50,6 +50,10 @@ enum SpeedStatus {
             return NSColor(red: 0.0, green: 0.8, blue: 0.0, alpha: 1.0)
         }
     }
+
+    var swiftUIColor: Color {
+        Color(color)
+    }
 }
 
 enum DarkMode: String, CaseIterable, Identifiable {
@@ -70,7 +74,13 @@ struct QuotaEntry: Identifiable {
     let resetSeconds: Int?
     let totalDurationSeconds: Int?
 
+    var displayPercent: Int {
+        Int((min(max(usagePercent, 0.0), 1.0) * 100).rounded(.down))
+    }
+
     var speedStatus: SpeedStatus {
+        if displayPercent < 5 { return .slow }
+
         guard let resetSeconds = resetSeconds, resetSeconds > 0,
               let totalDuration = totalDurationSeconds, totalDuration > 0 else {
             if usagePercent > 0.8 { return .fast }
@@ -78,18 +88,13 @@ struct QuotaEntry: Identifiable {
             return .normal
         }
 
-        let elapsedSeconds = totalDuration - resetSeconds
+        let elapsedSeconds = max(totalDuration - resetSeconds, 1)
         let elapsedPercent = Double(elapsedSeconds) / Double(totalDuration)
-        let remainingTimePercent = 1.0 - elapsedPercent
-        let remainingUsagePercent = 1.0 - usagePercent
+        let speedRatio = usagePercent / elapsedPercent
 
-        if remainingUsagePercent < remainingTimePercent * 0.5 {
-            return .fast
-        } else if remainingUsagePercent > remainingTimePercent * 1.3 {
-            return .slow
-        } else {
-            return .normal
-        }
+        if speedRatio > 1.3 { return .fast }
+        if speedRatio < 0.7 { return .slow }
+        return .normal
     }
 }
 
@@ -414,35 +419,6 @@ struct GLMLimit: Codable, Identifiable {
         default:
             return 24 * 60 * 60
         }
-    }
-
-    var speedStatus: SpeedStatus {
-        guard let remaining = resetTimeSeconds else { return .normal }
-
-        let total = totalDurationSeconds
-        let elapsed = max(total - remaining, 1)
-        let elapsedPercent = Double(elapsed) / Double(total)
-
-        if elapsedPercent < 0.01 { return .normal }
-
-        let speedRatio = usagePercent / elapsedPercent
-
-        if speedRatio > 1.3 { return .fast }
-        if speedRatio < 0.7 { return .slow }
-        return .normal
-    }
-
-    var speedPercent: Double {
-        guard let remaining = resetTimeSeconds else { return 0.5 }
-
-        let total = totalDurationSeconds
-        let elapsed = max(total - remaining, 1)
-        let elapsedPercent = Double(elapsed) / Double(total)
-
-        if elapsedPercent < 0.01 { return 0.5 }
-
-        let speedRatio = usagePercent / elapsedPercent
-        return min(max(speedRatio, 0), 2) / 2.0
     }
 
     var total: Int? {
