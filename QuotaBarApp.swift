@@ -132,7 +132,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
             .filter { $0.value }
             .compactMap { (platformId, _) -> String? in
                 guard let result = fetcher.perPlatformResults[platformId], !result.entries.isEmpty else { return nil }
-                let line = result.entries.map { "\($0.name): \(Int($0.usagePercent * 100))%" }.joined(separator: ", ")
+                let line = result.entries.map { "\($0.name): \($0.displayPercent)%" }.joined(separator: ", ")
                 return "\(platformId.uppercased()): \(line)"
             }
         button.toolTip = toolTipLines.isEmpty ? "Quota Bar" : toolTipLines.joined(separator: "\n")

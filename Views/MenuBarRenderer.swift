@@ -84,17 +84,6 @@ enum MenuBarRenderer {
         indicatorPath.fill()
     }
 
-    private static func speedSymbol(for status: SpeedStatus) -> String {
-        switch status {
-        case .fast:
-            return "▲"
-        case .normal:
-            return "●"
-        case .slow:
-            return "▼"
-        }
-    }
-
     private static func shortLabel(for name: String) -> String {
         if name.contains("5 Hours") || name == "5H" { return "5H" }
         if name.contains("Weekly") || name == "Weekly" { return "WK" }

@@ -21,7 +21,7 @@ enum GLMPlatform: String, CaseIterable, Identifiable {
 enum DisplayStyle: String, CaseIterable, Identifiable {
     case percent = "Percent (%)"
     case graph = "Graph (Bar)"
-    case speed = "Speed (Rate)"
+    case speed = "Speed (Pace)"
 
     var id: String { rawValue }
 }
@@ -78,22 +78,31 @@ struct QuotaEntry: Identifiable {
         Int((min(max(usagePercent, 0.0), 1.0) * 100).rounded(.down))
     }
 
-    var speedStatus: SpeedStatus {
-        if displayPercent < 5 { return .slow }
-
+    var paceRatio: Double? {
         guard let resetSeconds = resetSeconds, resetSeconds > 0,
               let totalDuration = totalDurationSeconds, totalDuration > 0 else {
-            if usagePercent > 0.8 { return .fast }
-            if usagePercent < 0.3 { return .slow }
-            return .normal
+            return nil
         }
 
         let elapsedSeconds = max(totalDuration - resetSeconds, 1)
         let elapsedPercent = Double(elapsedSeconds) / Double(totalDuration)
-        let speedRatio = usagePercent / elapsedPercent
+        return usagePercent / elapsedPercent
+    }
 
-        if speedRatio > 1.3 { return .fast }
-        if speedRatio < 0.7 { return .slow }
+    var speedStatus: SpeedStatus {
+        guard let paceRatio else {
+            if displayPercent >= 50 { return .normal }
+            return .slow
+        }
+
+        if paceRatio >= 1.25 {
+            return .fast
+        }
+
+        if paceRatio <= 0.75 {
+            return .slow
+        }
+
         return .normal
     }
 }
@@ -110,9 +119,6 @@ final class Storage: ObservableObject {
         static let legacyAPIKey = "GLM_API_KEY"
         static let legacyPlatform = "GLM_PLATFORM"
         static let legacyDisplayStyle = "GLM_DISPLAY_STYLE"
-        static let legacyShow5h = "GLM_SHOW_5H"
-        static let legacyShowWeekly = "GLM_SHOW_WEEKLY"
-        static let legacyShowMonthly = "GLM_SHOW_MONTHLY"
         static let legacyLaunchAtLogin = "GLM_LAUNCH_AT_LOGIN"
         static let legacyDarkMode = "GLM_DARK_MODE"
         static let apiKeys = "QB_API_KEYS"
@@ -154,24 +160,6 @@ final class Storage: ObservableObject {
     @Published var displayStyle: DisplayStyle {
         didSet {
             defaults.set(displayStyle.rawValue, forKey: Keys.legacyDisplayStyle)
-        }
-    }
-
-    @Published var show5h: Bool {
-        didSet {
-            defaults.set(show5h, forKey: Keys.legacyShow5h)
-        }
-    }
-
-    @Published var showWeekly: Bool {
-        didSet {
-            defaults.set(showWeekly, forKey: Keys.legacyShowWeekly)
-        }
-    }
-
-    @Published var showMonthly: Bool {
-        didSet {
-            defaults.set(showMonthly, forKey: Keys.legacyShowMonthly)
         }
     }
 
@@ -232,10 +220,6 @@ final class Storage: ObservableObject {
 
         let styleRaw = defaults.string(forKey: Keys.legacyDisplayStyle) ?? DisplayStyle.percent.rawValue
         self.displayStyle = DisplayStyle(rawValue: styleRaw) ?? .percent
-
-        self.show5h = defaults.object(forKey: Keys.legacyShow5h) as? Bool ?? true
-        self.showWeekly = defaults.object(forKey: Keys.legacyShowWeekly) as? Bool ?? true
-        self.showMonthly = defaults.object(forKey: Keys.legacyShowMonthly) as? Bool ?? true
 
         let shouldLaunch = defaults.object(forKey: Keys.legacyLaunchAtLogin) as? Bool ?? false
         let darkModeRaw = defaults.string(forKey: Keys.legacyDarkMode) ?? DarkMode.auto.rawValue
