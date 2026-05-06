@@ -38,18 +38,18 @@ jobs:
         uses: softprops/action-gh-release@v2
         with:
           files: |
-            dist/GLMBar.zip
+            dist/QuotaBar.zip
             dist/glm-bar-macos.tar.gz
           body: |
-            ## GLM Bar ${{ github.ref_name }}
+            ## Quota Bar ${{ github.ref_name }}
             
             ### Downloads
-            - **GLMBar.zip** - App bundle (recommended)
+            - **QuotaBar.zip** - App bundle (recommended)
             - **glm-bar-macos.tar.gz** - CLI binary
             
             ### Installation
-            1. Download `GLMBar.zip`
-            2. Extract and move `GLMBar.app` to Applications
+            1. Download `QuotaBar.zip`
+            2. Extract and move `QuotaBar.app` to Applications
             3. Right-click and select "Open" on first launch
             
             ### What's Changed

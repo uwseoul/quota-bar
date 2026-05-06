@@ -4,8 +4,8 @@ This runbook covers local and CI release steps for packaged GitHub Releases.
 
 ## Scope
 
-- `GLMBar.app` exposes an in-app "Check for Updates..." action that checks the latest GitHub release.
-- Both `GLMBar.app` and `glm-bar` are distributed through GitHub Releases.
+- `QuotaBar.app` exposes an in-app "Check for Updates..." action that checks the latest GitHub release.
+- Both `QuotaBar.app` and `quota-bar` are distributed through GitHub Releases.
 - There is no Sparkle feed or appcast generation in the current release flow.
 
 ## Required Secrets
@@ -33,8 +33,8 @@ RELEASE_VERSION=1.0.1 RELEASE_BUILD_NUMBER=101 RELEASE_TAG=v1.0.1 ./scripts/rele
 
 3. Verify outputs.
 
-- `dist/GLMBar.app`
-- `dist/GLMBar.zip`
+- `dist/QuotaBar.app`
+- `dist/QuotaBar.zip`
 - `dist/glm-bar-macos.tar.gz`
 
 4. Confirm the GitHub Release contains the expected assets for the tag.
@@ -44,7 +44,7 @@ RELEASE_VERSION=1.0.1 RELEASE_BUILD_NUMBER=101 RELEASE_TAG=v1.0.1 ./scripts/rele
 - Workflow: `.github/workflows/release.yml`
 - Trigger: push tag matching `v*`
 - Outputs:
-  - GitHub Release assets: `dist/GLMBar.zip`, `dist/glm-bar-macos.tar.gz`
+  - GitHub Release assets: `dist/QuotaBar.zip`, `dist/glm-bar-macos.tar.gz`
 
 Tag and push:
 
@@ -73,5 +73,5 @@ git push origin v1.0.1
 
 ### Release assets missing
 
-- Symptom: GitHub Release completes without `GLMBar.zip` or `glm-bar-macos.tar.gz`.
+- Symptom: GitHub Release completes without `QuotaBar.zip` or `glm-bar-macos.tar.gz`.
 - Action: inspect `.github/workflows/release.yml` and local `dist/` outputs, then rerun the release after the build step succeeds.
