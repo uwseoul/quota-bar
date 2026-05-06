@@ -9,9 +9,9 @@ SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 PROJECT_ROOT="$(cd "$SCRIPT_DIR/.." && pwd)"
 
 DIST_DIR="$PROJECT_ROOT/dist"
-TERMINAL_BINARY="$DIST_DIR/glm-bar"
-APP_BUNDLE="$DIST_DIR/GLMBar.app"
-APP_BINARY="$APP_BUNDLE/Contents/MacOS/GLMBar"
+TERMINAL_BINARY="$DIST_DIR/quota-bar"
+APP_BUNDLE="$DIST_DIR/QuotaBar.app"
+APP_BINARY="$APP_BUNDLE/Contents/MacOS/QuotaBar"
 APP_INFO_PLIST="$APP_BUNDLE/Contents/Info.plist"
 
 RED='\033[0;31m'
@@ -97,18 +97,18 @@ if [[ -f "$APP_INFO_PLIST" ]]; then
 
     # Check CFBundleExecutable
     bundle_exec=$(defaults read "$APP_INFO_PLIST" CFBundleExecutable 2>/dev/null || true)
-    if [[ "$bundle_exec" == "GLMBar" ]]; then
-        check_pass "CFBundleExecutable = GLMBar"
+    if [[ "$bundle_exec" == "QuotaBar" ]]; then
+        check_pass "CFBundleExecutable = QuotaBar"
     else
-        check_fail "CFBundleExecutable should be 'GLMBar', got: '$bundle_exec'"
+        check_fail "CFBundleExecutable should be 'QuotaBar', got: '$bundle_exec'"
     fi
 
     # Check CFBundleIdentifier
     bundle_id=$(defaults read "$APP_INFO_PLIST" CFBundleIdentifier 2>/dev/null || true)
-    if [[ "$bundle_id" == "com.uwseoul.glmbar" ]]; then
-        check_pass "CFBundleIdentifier = com.uwseoul.glmbar"
+    if [[ "$bundle_id" == "com.uwseoul.quotabar" ]]; then
+        check_pass "CFBundleIdentifier = com.uwseoul.quotabar"
     else
-        check_fail "CFBundleIdentifier should be 'com.uwseoul.glmbar', got: '$bundle_id'"
+        check_fail "CFBundleIdentifier should be 'com.uwseoul.quotabar', got: '$bundle_id'"
     fi
 
     # Check CFBundlePackageType

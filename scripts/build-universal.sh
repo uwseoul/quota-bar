@@ -6,6 +6,7 @@ PROJECT_ROOT="$(cd "$SCRIPT_DIR/.." && pwd)"
 
 SOURCE_FILES=(
     "$PROJECT_ROOT/QuotaBarApp.swift"
+    "$PROJECT_ROOT/UpdaterController.swift"
     "$PROJECT_ROOT/Models/Storage.swift"
     "$PROJECT_ROOT/Services/UsageFetcher.swift"
     "$PROJECT_ROOT/Services/GLMFetcher.swift"

@@ -37,8 +37,8 @@ require_file "$PREREQ_SCRIPT"
 echo "[release] Building release artifacts..."
 RELEASE_BUILD=1 RELEASE_VERSION="$RELEASE_VERSION" RELEASE_BUILD_NUMBER="$RELEASE_BUILD_NUMBER" "$BUILD_SCRIPT"
 
-APP_BUNDLE="$DIST_DIR/GLMBar.app"
-APP_ZIP="$DIST_DIR/GLMBar.zip"
+APP_BUNDLE="$DIST_DIR/QuotaBar.app"
+APP_ZIP="$DIST_DIR/QuotaBar.zip"
 CLI_TAR="$DIST_DIR/glm-bar-macos.tar.gz"
 
 require_file "$APP_ZIP"
@@ -58,7 +58,7 @@ if [[ -n "${APPLE_ID:-}" && -n "${APPLE_APP_SPECIFIC_PASSWORD:-}" && -n "${APPLE
     echo "[release] Repackaging stapled app bundle..."
     rm -f "$APP_ZIP"
     pushd "$DIST_DIR" >/dev/null
-    zip -r -q "GLMBar.zip" "GLMBar.app"
+    zip -r -q "QuotaBar.zip" "QuotaBar.app"
     popd >/dev/null
 
     echo "[release] Validating Gatekeeper acceptance..."
