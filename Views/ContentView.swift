@@ -144,6 +144,10 @@ struct ContentView: View {
             .padding(.vertical, 6)
             .background(Color.primary.opacity(0.06))
 
+            if section.id == "glm" && storage.selectedPlatform == .zai {
+                peakBanner
+            }
+
             if let error = section.error, section.entries.isEmpty {
                 Text(error)
                     .foregroundColor(.red)
@@ -170,6 +174,50 @@ struct ContentView: View {
                         .stroke(Color.primary.opacity(0.35), lineWidth: 1)
                 )
         )
+    }
+
+    @ViewBuilder
+    private var peakBanner: some View {
+        TimelineView(.periodic(from: .now, by: 60)) { context in
+            let isPeak = PeakHours.isPeak(at: context.date)
+            let remaining = PeakHours.secondsUntilTransition(at: context.date)
+            let isWeekend = PeakHours.isWeekend(at: context.date)
+
+            VStack(alignment: .leading, spacing: 2) {
+                HStack(spacing: 4) {
+                    Image(systemName: isPeak ? "exclamationmark.triangle.fill" : "checkmark.circle.fill")
+                        .font(.system(size: 10))
+                    Text(isPeak ? "현재 혼잡 시간대" : "현재 비혼잡 시간대")
+                        .font(.system(size: 11, weight: .semibold))
+                }
+
+                if isPeak {
+                    Text("혼잡 \(PeakHours.windowLabelKST) · 종료까지 \(PeakHours.formatRemaining(remaining))")
+                        .font(.system(size: 9))
+                } else if isWeekend {
+                    Text("주말 · 혼잡: 평일 \(PeakHours.windowLabelKST)")
+                        .font(.system(size: 9))
+                } else {
+                    Text("혼잡 \(PeakHours.windowLabelKST) · 시작까지 \(PeakHours.formatRemaining(remaining))")
+                        .font(.system(size: 9))
+                }
+            }
+            .frame(maxWidth: .infinity, alignment: .leading)
+            .padding(.horizontal, 10)
+            .padding(.vertical, 6)
+            .background(
+                isPeak
+                    ? Color.orange.opacity(0.18)
+                    : Color.primary.opacity(0.05)
+            )
+            .overlay(
+                Rectangle()
+                    .fill(isPeak ? Color.orange.opacity(0.5) : Color.primary.opacity(0.15))
+                    .frame(height: 0.5),
+                alignment: .bottom
+            )
+            .foregroundColor(isPeak ? .orange : .secondary)
+        }
     }
 
     @ViewBuilder

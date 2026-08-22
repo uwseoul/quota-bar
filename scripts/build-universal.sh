@@ -13,6 +13,7 @@ SOURCE_FILES=(
     "$PROJECT_ROOT/Services/MiniMaxFetcher.swift"
     "$PROJECT_ROOT/Services/CodexFetcher.swift"
     "$PROJECT_ROOT/Services/OpenCodeGoFetcher.swift"
+    "$PROJECT_ROOT/Services/PeakHours.swift"
     "$PROJECT_ROOT/Views/ContentView.swift"
     "$PROJECT_ROOT/Views/SettingsView.swift"
     "$PROJECT_ROOT/Views/MenuBarRenderer.swift"

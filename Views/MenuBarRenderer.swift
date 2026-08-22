@@ -21,7 +21,7 @@ enum MenuBarRenderer {
                 .foregroundColor: NSColor.white.withAlphaComponent(0.7),
                 .paragraphStyle: labelStyle
             ]
-            let labelString = NSAttributedString(string: shortLabel(for: entry.name), attributes: labelAttributes)
+            let labelString = NSAttributedString(string: shortLabel(for: entry.platformId), attributes: labelAttributes)
             labelString.draw(in: NSRect(x: xOffset, y: 11, width: itemWidth, height: 11))
 
             switch displayStyle {
@@ -84,13 +84,18 @@ enum MenuBarRenderer {
         indicatorPath.fill()
     }
 
-    private static func shortLabel(for name: String) -> String {
-        if name.contains("5 Hours") || name == "5H" { return "5H" }
-        if name.contains("Weekly") || name == "Weekly" { return "WK" }
-        if name.contains("Monthly") || name == "Monthly" { return "MO" }
-        if name == "7D" { return "7D" }
-        if name == "Review" { return "RV" }
-        if name == "Rolling" { return "RL" }
-        return "QT"
+    private static func shortLabel(for platformId: String) -> String {
+        switch platformId {
+        case "glm":
+            return "GLM"
+        case "minimax":
+            return "MMX"
+        case "codex":
+            return "CDX"
+        case "opencodego":
+            return "OCG"
+        default:
+            return String(platformId.prefix(3)).uppercased()
+        }
     }
 }
