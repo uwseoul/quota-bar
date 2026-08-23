@@ -47,7 +47,7 @@ enum SpeedStatus {
         case .normal:
             return NSColor(red: 1.0, green: 0.75, blue: 0.0, alpha: 1.0)
         case .slow:
-            return NSColor(red: 0.0, green: 0.8, blue: 0.0, alpha: 1.0)
+            return NSColor(red: 0.0, green: 1.0, blue: 0.251, alpha: 1.0)
         }
     }
 
