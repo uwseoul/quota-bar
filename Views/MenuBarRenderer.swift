@@ -18,7 +18,9 @@ enum MenuBarRenderer {
             labelStyle.alignment = .center
             let labelAttributes: [NSAttributedString.Key: Any] = [
                 .font: NSFont.systemFont(ofSize: 9, weight: .regular),
-                .foregroundColor: NSColor.white.withAlphaComponent(0.7),
+                .foregroundColor: isDarkMode
+                    ? NSColor.white.withAlphaComponent(0.7)
+                    : NSColor.black.withAlphaComponent(0.62),
                 .paragraphStyle: labelStyle
             ]
             let labelString = NSAttributedString(string: shortLabel(for: entry.platformId), attributes: labelAttributes)
@@ -30,7 +32,7 @@ enum MenuBarRenderer {
                 valueStyle.alignment = .center
                 let valueAttributes: [NSAttributedString.Key: Any] = [
                     .font: NSFont.monospacedDigitSystemFont(ofSize: 11, weight: .bold),
-                    .foregroundColor: NSColor.white,
+                    .foregroundColor: isDarkMode ? NSColor.white : NSColor.black,
                     .paragraphStyle: valueStyle
                 ]
                 let valueString = NSAttributedString(
@@ -40,7 +42,7 @@ enum MenuBarRenderer {
                 valueString.draw(in: NSRect(x: xOffset, y: 0, width: itemWidth, height: 12))
 
             case .graph:
-                drawBar(for: entry, xOffset: xOffset, itemWidth: itemWidth, showSpeedIndicator: false)
+                drawBar(for: entry, xOffset: xOffset, itemWidth: itemWidth, isDarkMode: isDarkMode)
 
             case .speed:
                 drawSignalOnly(for: entry, xOffset: xOffset, itemWidth: itemWidth)
@@ -51,7 +53,7 @@ enum MenuBarRenderer {
         return image
     }
 
-    private static func drawBar(for entry: QuotaEntry, xOffset: CGFloat, itemWidth: CGFloat, showSpeedIndicator: Bool) {
+    private static func drawBar(for entry: QuotaEntry, xOffset: CGFloat, itemWidth: CGFloat, isDarkMode: Bool) {
         let barWidth: CGFloat = 24
         let barHeight: CGFloat = 4
         let barX = xOffset + (itemWidth - barWidth) / 2
@@ -62,7 +64,9 @@ enum MenuBarRenderer {
             xRadius: 2,
             yRadius: 2
         )
-        NSColor.lightGray.setFill()
+        (isDarkMode
+            ? NSColor.white.withAlphaComponent(0.25)
+            : NSColor.black.withAlphaComponent(0.18)).setFill()
         background.fill()
 
         let fillWidth = entry.displayPercent == 0 ? 0 : barWidth * CGFloat(min(max(entry.usagePercent, 0.05), 1.0))

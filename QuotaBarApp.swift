@@ -16,6 +16,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
     private var statusItem: NSStatusItem?
     private var refreshTimer: Timer?
     private var rightClickMonitor: Any?
+    private var appearanceObservation: NSKeyValueObservation?
     private var cancellables = Set<AnyCancellable>()
 
     func applicationDidFinishLaunching(_ notification: Notification) {
@@ -24,6 +25,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
         configurePopover()
         configureStatusItem()
         observeState()
+        observeAppearanceChanges()
         setupRightClickMonitor()
         refreshUsage()
         updaterController.checkForUpdatesInBackground()
@@ -32,6 +34,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
 
     func applicationWillTerminate(_ notification: Notification) {
         refreshTimer?.invalidate()
+        appearanceObservation?.invalidate()
         if let monitor = rightClickMonitor {
             NSEvent.removeMonitor(monitor)
         }
@@ -86,6 +89,17 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
         }
     }
 
+    private func observeAppearanceChanges() {
+        appearanceObservation = NSApplication.shared.observe(
+            \.effectiveAppearance,
+            options: [.new]
+        ) { [weak self] _, _ in
+            DispatchQueue.main.async {
+                self?.updateStatusItem()
+            }
+        }
+    }
+
     private func startRefreshTimer() {
         refreshTimer?.invalidate()
         refreshTimer = Timer.scheduledTimer(withTimeInterval: 300, repeats: true) { [weak self] _ in
@@ -102,19 +116,16 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
     private func updateStatusItem() {
         guard let button = statusItem?.button else { return }
 
-        let isDarkMode: Bool = {
-            switch storage.darkMode {
-            case .dark:
-                return true
-            case .light:
-                return false
-            case .auto:
-                if #available(macOS 10.14, *) {
-                    return NSApp.effectiveAppearance.bestMatch(from: [.darkAqua, .aqua]) == .darkAqua
-                }
-                return false
-            }
-        }()
+        // Match the menu bar's actual rendering context. applyAppearance()
+        // forces NSApp.appearance for light/dark overrides, and .auto follows
+        // the system, so effectiveAppearance always reflects what the status
+        // item is drawn against — including live system theme switches.
+        let isDarkMode: Bool
+        if #available(macOS 10.14, *) {
+            isDarkMode = NSApp.effectiveAppearance.bestMatch(from: [.darkAqua, .aqua]) == .darkAqua
+        } else {
+            isDarkMode = false
+        }
 
         let visibleEntries = storage.visibleMenuBarEntries(from: fetcher.entries)
 
